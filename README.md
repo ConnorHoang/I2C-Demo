@@ -1,4 +1,4 @@
-Sorry. Here is the write-up: Required Implementation Components:
+Required Implementation Components:
 ● GPIO’s configured fittingly
 ● SDA and SCL lines
 ● Start and stop conditions

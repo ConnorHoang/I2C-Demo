@@ -1,12 +1,12 @@
 For this project I developed an I2C bit-banging communication protocol using an STM32 as a transceiver. I validated this project using the software debugger in STMCubeIDE as well as an external logic analyzer for observing specifically the transmitter.
 
-ACK/NACK bit handling starts by reading in the data line (after the address and start bits). If an ACK is received, the system moves on as planned and starts transmitting data. If a NACK is received, the program terminates its current process and tries again. Once it fully transmits, it waits 5 seconds then begins sending again.
+ACK/NACK bit handling starts by reading in the data line (after the address and start bits). If an ACK is received, the system moves on as planned and starts transmitting data. If a NACK is received, the program terminates its current process and tries again. Once it fully transmits, it waits 100 ms then begins sending again. For testing purposes, a flag 'LOGIC_ANALYZER' exists that when high fakes ACK so the transmit sequence will complete.
 
-Clock generation was done artificially on the transmitter with delays for ease. The transmitter treats each delay as a half clock cycle while interrupts are used on the receiver. The interrupts are done so that instead of constantly polling to check for transmitted data, the receiver only does its work when it has data to work with. This is also helpful given both systems were on the same board for my testing in this demo.
+Clock generation was done artificially on the transmitter with delays for ease. The transmitter treats each delay as a partial clock cycle while interrupts are used on the receiver. The interrupts are done so that instead of constantly polling to check for transmitted data, the receiver only does its work when it has data to work with. This is also helpful given both systems were on the same board for my testing in this demo.
 
 As such, the transmitter works based on polling, but the receiver is using interrupts.
 
-The code works around using the delay to simulate a clock, with the transmitter following a sequence of stages that advance with each clock transition and the following ACK/NACK as necessary. The broad start, stop, sending a byte of data were siloed into functions to abstract the logic. The logic goes in the standard I2C order, with the logic restarting to the top anytime it receives a NACK. A binary flag determines whether the sequence is for reading or writing.
+The code works around using the delay to simulate a clock, with the transmitter following a sequence of stages that advance with each clock transition and the following ACK/NACK as necessary. The broad start, stop, sending a byte of data were siloed into functions to abstract the logic. The logic goes in the standard I2C order. A binary flag determines whether the sequence is for reading or writing, however the receiver currently only reads data.
 
 In I2C, we need space to change the clock, and in between to either have a change while the clock is high, or change to set data while the clock is low. As such the delay time was chosen to be half a clock tick, as such allows for control at each of those stages.
 
